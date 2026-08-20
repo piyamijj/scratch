@@ -51,7 +51,6 @@
   p.sub{margin-top:8px;font-size:14px;color:var(--muted);line-height:1.5;max-width:320px;margin-left:auto;margin-right:auto}
   p.sub b{color:var(--text);font-weight:600}
 
-  /* ── Card ──────────────────────────────── */
   .card-wrap{
     width:100%;max-width:430px;
     margin:20px auto 0;
@@ -87,7 +86,6 @@
     background:linear-gradient(115deg, rgba(255,255,255,.14) 0%, transparent 28%, transparent 70%, rgba(255,255,255,.05) 100%);
   }
 
-  /* progress chip */
   .prog{
     position:absolute;top:10px;right:10px;z-index:5;
     display:flex;align-items:center;gap:6px;
@@ -109,7 +107,6 @@
     transition:width .25s ease;
   }
 
-  /* scratch hint */
   .hint-cloud{
     position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;
     pointer-events:none;transition:opacity .5s;opacity:1;
@@ -128,7 +125,6 @@
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
   .hint-pill .spark{color:var(--accent2);font-size:16px}
 
-  /* done overlay */
   .done-overlay{
     position:absolute;inset:0;z-index:7;display:none;
     align-items:flex-end;justify-content:center;
@@ -146,7 +142,6 @@
     backdrop-filter:blur(8px);
   }
 
-  /* ── Controls ─────────────────────────── */
   .controls{
     width:100%;max-width:430px;
     display:flex;flex-direction:column;align-items:center;gap:14px;
@@ -181,9 +176,9 @@
 <body>
 
 <header>
-  <div class="badge"><span class="dot"></span> Kazı Kazan ·@ Gizli Sürpriz</div>
+  <div class="badge"><span class="dot"></span> Kazı Kazan · Gizli Sürpriz</div>
   <h1>Parmağını gezdir, <span class="hint">sırrı açığa çıkar</span></h1>
-  <p class="sub">Bulutların ardında bir görsel saklı. <b>Dokun ve sürükle</b> – bulutları kazı, gergçğ gör.</p>
+  <p class="sub">Fotoğrafın ardında bir görsel saklı. <b>Dokun ve sürükle</b> — fotoğrafı kaz, gerçeği gör.</p>
 </header>
 
 <div class="card-wrap" id="wrap">
@@ -212,11 +207,11 @@
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
     Tekrar Kazı
   </button>
-  <button class="btn btn-ghost" id="resetBtn">Bulutları Geri Getir</button>
+  <button class="btn btn-ghost" id="resetBtn">Fotoğrafı Geri Getir</button>
 </div>
 
 <footer>
-  <div class="rules">Parmak ya da fare ile sürükle – her geçiş bulutları siler.</div>
+  <div class="rules">Parmak ya da fare ile sürükle — her geçiş fotoğrafı siler.</div>
   <div>Gizem açığa çıkmayı bekliyor 🎭</div>
 </footer>
 
@@ -227,7 +222,7 @@
   var stage  = document.getElementById('stage');
   var canvas = document.getElementById('scratch');
   var ctx    = canvas.getContext('2d', { willReadFrequently: true });
-  var wrap    = document.getElementById('wrap');
+  var wrap   = document.getElementById('wrap');
   var hint   = document.getElementById('hint');
   var progEl = document.getElementById('prog');
   var progText = document.getElementById('progText');
@@ -256,32 +251,23 @@
     }catch(e){}
   }
 
-  var clouds = new Image();
+  var cover = new Image();
   var prize  = document.getElementById('prize');
-  var CLOUD_SRC = 'images/cloud_texture.png';
+  var COVER_SRC = 'images/new_cover.jpg';
   var SCRATCH_W = 1000;   // fixed logical canvas width
   var SCRATCH_H = 1792;   // ~ 714/1280 ratio × 1000 (rounded)
   var brushR = 52;
 
-  var W=0, H=0, dpr=1, erased=0, total=0, revealed=false, cloudLoaded=false, prizeLoaded=false;
+  var W=0, H=0, dpr=1, erased=0, total=0, revealed=false, coverLoaded=false, prizeLoaded=false;
   var drawing=false, lastX=0, lastY=0, raf=false, needsInit=true;
 
-  /* ── helpers ─────────────────────────── */
+  /* ── helpers ───────────────────────────────────────────── */
   function rand(a,b){ return a + Math.random()*(b-a); }
 
-  function fillClouds(w,h){
-    ctx.fillStyle = '#b9c6d6';
-    ctx.fillRect(0,0,w,h);
-    if(!cloudLoaded){ return; }
-    var tw = clouds.width, th = clouds.height;
-    var ox = rand(0,tw), oy = rand(0,th);
-    /* robust tiling: start one tile before the origin so large random
-       offsets can never leave an uncovered gap (tiles can exceed canvas) */
-    for(var r=-1; r*th - oy < h; r++){
-      for(var c=-1; c*tw - ox < w; c++){
-        ctx.drawImage(clouds, (c*tw - ox), (r*th - oy));
-      }
-    }
+  function fillCover(w,h){
+    if(!coverLoaded){ ctx.fillStyle='#141a22'; ctx.fillRect(0,0,w,h); return; }
+    /* the photo fills the whole card — no tiling needed */
+    ctx.drawImage(cover, 0, 0, w, h);
   }
 
   function showHint(on){
@@ -325,7 +311,7 @@
     ctx.globalCompositeOperation = 'source-over';
   }
 
-  /* ── pointer (mouse + touch) ──────────── */
+  /* ── pointer (mouse + touch) ────────────────────────────── */
   function getPos(e){
     var rect = canvas.getBoundingClientRect();
     var x = (e.clientX - rect.left) * (W/rect.width);
@@ -347,6 +333,10 @@
       ctx.fill();
     }
     ctx.lineWidth = brushR*2;
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
     ctx.restore();
     erased += steps*3 + 6;
     refreshPct();
@@ -391,7 +381,7 @@
   canvas.addEventListener('pointerup', endStroke);
   canvas.addEventListener('pointercancel', endStroke);
 
-  /* ── resize / init ───────────────────── */
+  /* ── resize / init ──────────────────────────────────────── */
   function resize(){
     var rect = stage.getBoundingClientRect();
     dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -399,7 +389,7 @@
     H = Math.round(rect.height * dpr);
     canvas.width = W; canvas.height = H;
     ctx.setTransform(1,0,0,1,0,0);
-    fillClouds(W,H);
+    fillCover(W,H);
     erased=0; total=0; revealed=false;
     wrap.classList.remove('done','scratching');
     progEl.classList.remove('hidden');
@@ -412,27 +402,27 @@
     resize();
   }
 
-  /* ── boot ─────────────────────────────── */
+  /* ── boot ───────────────────────────────────────────────── */
   function boot(){
-    if(!cloudLoaded && clouds.complete && clouds.naturalWidth > 0){
-      cloudLoaded = true;
+    if(!coverLoaded && cover.complete && cover.naturalWidth > 0){
+      coverLoaded = true;
     }
-    if(!cloudLoaded){
-      clouds.onload = function(){
-        cloudLoaded = true;
+    if(!coverLoaded){
+      cover.onload = function(){
+        coverLoaded = true;
         resize();
       };
-      clouds.onerror = function(){
-        cloudLoaded = false;
+      cover.onerror = function(){
+        coverLoaded = false;
         resize();
       };
-      clouds.src = CLOUD_SRC;
+      cover.src = COVER_SRC;
       return;
     }
     resize();
   }
 
-  /* ── actions ──────────────────────────── */
+  /* ── actions ────────────────────────────────────────────── */
   function resetScratch(){
     voilaEl.pause();
     voilaEl.currentTime = 0;
