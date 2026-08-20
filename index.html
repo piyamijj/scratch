@@ -51,6 +51,7 @@
   p.sub{margin-top:8px;font-size:14px;color:var(--muted);line-height:1.5;max-width:320px;margin-left:auto;margin-right:auto}
   p.sub b{color:var(--text);font-weight:600}
 
+  /* ── Card ──────────────── */
   .card-wrap{
     width:100%;max-width:430px;
     margin:20px auto 0;
@@ -86,6 +87,7 @@
     background:linear-gradient(115deg, rgba(255,255,255,.14) 0%, transparent 28%, transparent 70%, rgba(255,255,255,.05) 100%);
   }
 
+  /* progress chip */
   .prog{
     position:absolute;top:10px;right:10px;z-index:5;
     display:flex;align-items:center;gap:6px;
@@ -107,6 +109,7 @@
     transition:width .25s ease;
   }
 
+  /* scratch hint */
   .hint-cloud{
     position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;
     pointer-events:none;transition:opacity .5s;opacity:1;
@@ -125,6 +128,7 @@
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
   .hint-pill .spark{color:var(--accent2);font-size:16px}
 
+  /* done overlay */
   .done-overlay{
     position:absolute;inset:0;z-index:7;display:none;
     align-items:flex-end;justify-content:center;
@@ -142,6 +146,7 @@
     backdrop-filter:blur(8px);
   }
 
+  /* ── Controls ──────────────── */
   .controls{
     width:100%;max-width:430px;
     display:flex;flex-direction:column;align-items:center;gap:14px;
@@ -261,7 +266,7 @@
   var W=0, H=0, dpr=1, erased=0, total=0, revealed=false, coverLoaded=false, prizeLoaded=false;
   var drawing=false, lastX=0, lastY=0, raf=false, needsInit=true;
 
-  /* ── helpers ───────────────────────────────────────────── */
+  /* ── helpers ──────────────── */
   function rand(a,b){ return a + Math.random()*(b-a); }
 
   function fillCover(w,h){
@@ -311,7 +316,7 @@
     ctx.globalCompositeOperation = 'source-over';
   }
 
-  /* ── pointer (mouse + touch) ────────────────────────────── */
+  /* ── pointer (mouse + touch) ──────────────── */
   function getPos(e){
     var rect = canvas.getBoundingClientRect();
     var x = (e.clientX - rect.left) * (W/rect.width);
@@ -381,7 +386,7 @@
   canvas.addEventListener('pointerup', endStroke);
   canvas.addEventListener('pointercancel', endStroke);
 
-  /* ── resize / init ──────────────────────────────────────── */
+  /* ── resize / init ──────────────── */
   function resize(){
     var rect = stage.getBoundingClientRect();
     dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -402,7 +407,7 @@
     resize();
   }
 
-  /* ── boot ───────────────────────────────────────────────── */
+  /* ── boot ──────────────── */
   function boot(){
     if(!coverLoaded && cover.complete && cover.naturalWidth > 0){
       coverLoaded = true;
@@ -422,7 +427,7 @@
     resize();
   }
 
-  /* ── actions ────────────────────────────────────────────── */
+  /* ── actions ──────────────── */
   function resetScratch(){
     voilaEl.pause();
     voilaEl.currentTime = 0;
